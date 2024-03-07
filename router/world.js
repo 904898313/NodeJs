@@ -1,21 +1,39 @@
 /*
  * @Author: yangchenguang
- * @Description: 用户
+ * @Description: 世界
  * @Date: 2023-09-28 16:52:20
  * @LastEditors: yangchenguang
- * @LastEditTime: 2024-03-01 10:26:37
+ * @LastEditTime: 2024-03-05 17:12:24
  */
 
 import express from "express";
 import { body, validationResult } from "express-validator";
+import sql from "../db/index.js";
 
 const userRouter = express.Router();
 
-// 获取用户信息
-userRouter.get("/getUserInfo", (req, res) => {
+// 获取城市信息
+userRouter.get("/getCountry", async (req, res) => {
+  const sqlQuery = [];
+  const sqlParams = [];
+  const { Name, Region } = req.query;
+  if (Name) {
+    sqlQuery.push("Name = ?");
+    sqlParams.push(Name);
+  }
+  if (Region) {
+    sqlQuery.push("Region = ?");
+    sqlParams.push(Region);
+  }
+
+  let q = `SELECT * FROM country`;
+  if (sqlQuery.length) {
+    q += ` WHERE ${sqlQuery.join(" AND ")}`;
+  }
+  const [results, fields] = await sql.query(q, sqlParams);
   res.send({
     success: true,
-    data: `我是李坤夏今年${Math.floor(Math.random() * 100)}岁`,
+    data: results,
   });
 });
 
